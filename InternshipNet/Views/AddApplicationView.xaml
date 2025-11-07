@@ -1,0 +1,19 @@
+﻿<Window x:Class="InternshipNet.Views.AddApplicationView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add New Application" Height="220" Width="300"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="15">
+        <TextBlock Text="Student Name:"/>
+        <TextBox Text="{Binding StudentName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Margin="0,5,0,10"/>
+
+        <TextBlock Text="Status:"/>
+        <ComboBox ItemsSource="{Binding Statuses}" 
+                  SelectedItem="{Binding Status}" Margin="0,5,0,15"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="OK" IsDefault="True" Click="OkButton_Click" Width="75"/>
+            <Button Content="Cancel" IsCancel="True" Width="75" Margin="5,0,0,0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

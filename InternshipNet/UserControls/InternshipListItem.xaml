@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="InternshipNet.UserControls.InternshipListItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:InternshipNet.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="200"
+             x:Name="root">
+    <!-- 1. Дали ім'я всьому UserControl -->
+
+    <!-- 2. Встановлюємо DataContext для Grid, щоб він брав дані з нашої властивості 'Internship' -->
+    <Grid Margin="5" DataContext="{Binding ElementName=root, Path=Internship}">
+        <StackPanel>
+            <!-- Тепер ці прив'язки працюють відносно Internship, а не старого DataContext -->
+            <TextBlock Text="{Binding Title}" FontWeight="Bold" />
+            <TextBlock Text="{Binding CompanyName}" FontStyle="Italic" />
+        </StackPanel>
+    </Grid>
+</UserControl>

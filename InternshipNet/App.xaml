@@ -1,0 +1,62 @@
+﻿<Application x:Class="InternshipNet.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:InternshipNet.Converters"
+             StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+        <!-- Реєструємо наш новий конвертер, щоб його можна було використовувати в усьому додатку -->
+        <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+
+        <!-- Глобальний стиль для всіх кнопок -->
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="MinWidth" Value="75"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <!-- Встановлюємо початковий колір фону. Це важливо для анімації -->
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="#DDDDDD"/>
+                </Setter.Value>
+            </Setter>
+
+            <!-- Визначаємо тригери - дії, які виконуються при зміні властивостей -->
+            <Style.Triggers>
+                <!-- Тригер спрацьовує, коли курсор миші знаходиться над кнопкою -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <!-- Дії, які потрібно виконати, коли тригер активувався -->
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <!-- Анімація плавно змінює колір фону на світло-блакитний за 0.2 секунди -->
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                      To="#BEE6FD" 
+                                      Duration="0:0:0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+
+                    <!-- Дії, які потрібно виконати, коли тригер деактивувався (курсор пішов) -->
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <!-- Анімація плавно повертає колір фону до початкового сірого -->
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                      To="#DDDDDD" 
+                                      Duration="0:0:0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для рядка DataGrid, який використовує наш конвертер -->
+        <Style x:Key="StatusRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+        </Style>
+
+    </Application.Resources>
+</Application>
