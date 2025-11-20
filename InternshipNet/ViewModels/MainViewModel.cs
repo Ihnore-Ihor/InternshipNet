@@ -1,105 +1,180 @@
-﻿using InternshipNet.Models;
-using InternshipNet.Services; // Додаємо using для сервісу
-using InternshipNet.Mappers; // <-- Додаємо using для маппера
-using InternshipNet.ViewModels; // <-- Додаємо using для ViewModel
+﻿using InternshipNet.Data;
+using InternshipNet.Models;
+using InternshipNet.Services;
+using InternshipNet.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows; // Додаємо using для MessageBoxusing System.Windows.Input;
+using System.Windows;
 using System.Windows.Input;
 
 namespace InternshipNet.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly JsonDataService _dataService;
-        private readonly InternshipMapper _mapper; // <-- Створюємо екземпляр маппера
-        private const string FilePath = "internships.json"; // Назва файлу для збереження
+        private readonly ApplicationDbContext _context;
+        private readonly AdoNetService _adoService;
+
+        public ObservableCollection<InternshipViewModel> Internships { get; set; }
 
         private InternshipViewModel _selectedInternship;
         public InternshipViewModel SelectedInternship
         {
             get => _selectedInternship;
-            set { _selectedInternship = value; OnPropertyChanged(); }
+            set
+            {
+                _selectedInternship = value;
+                OnPropertyChanged();
+                LoadApplications();
+            }
         }
 
-        public ObservableCollection<InternshipViewModel> Internships { get; set; }
+        public ObservableCollection<StudentApplication> SelectedApplications { get; set; }
 
         public ICommand LoadCommand { get; }
-        public ICommand SaveCommand { get; }
-
+        public ICommand AddInternshipCommand { get; }
         public ICommand AddApplicationCommand { get; }
-
+        public ICommand CheckStatsCommand { get; }
+        public ICommand AcceptCommand { get; }
+        public ICommand RejectCommand { get; }
 
         public MainViewModel()
         {
-            _dataService = new JsonDataService(); // Створюємо екземпляр сервісу
-            _mapper = new InternshipMapper(); // <-- Ініціалізуємо маппер
+            _context = new ApplicationDbContext();
+            _adoService = new AdoNetService();
 
             LoadCommand = new RelayCommand(LoadData);
-            SaveCommand = new RelayCommand(SaveData);
+            AddInternshipCommand = new RelayCommand(AddInternship);
+            AddApplicationCommand = new RelayCommand(AddApplication);
+            CheckStatsCommand = new RelayCommand(CheckStats);
 
-            AddApplicationCommand = new RelayCommand(AddApplication, CanAddApplication);
+            AcceptCommand = new RelayCommand(param => UpdateAppStatus(param, ApplicationStatus.Accepted));
+            RejectCommand = new RelayCommand(param => UpdateAppStatus(param, ApplicationStatus.Rejected));
 
-            // Завантажуємо дані при старті
-            LoadData(null);
-        }
-
-        private bool CanAddApplication(object parameter)
-        {
-            // Команду можна виконати тільки якщо обрано стажування
-            return SelectedInternship != null;
-        }
-
-        private void AddApplication(object parameter)
-        {
-            var viewModel = new AddApplicationViewModel();
-            var view = new Views.AddApplicationView
-            {
-                DataContext = viewModel,
-                Owner = Application.Current.MainWindow // Робимо вікно модальним відносно головного
-            };
-
-            // Показуємо вікно і чекаємо, поки його закриють
-            if (view.ShowDialog() == true)
-            {
-                // Якщо користувач натиснув "OK", додаємо нову заявку до списку
-                SelectedInternship.Applications.Add(viewModel.Application);
-            }
+            try { LoadData(null); } catch { }
         }
 
         private void LoadData(object parameter)
         {
-            var internshipModels = _dataService.Load(FilePath);
+            var list = _context.Internships
+                .Include(i => i.Company)
+                .OrderByDescending(i => i.Id)
+                .ToList();
 
-            if (!internshipModels.Any()) // Якщо файл порожній
-            {
-                // Створюємо моделі, як і раніше
-                internshipModels = new ObservableCollection<Internship> { /* ... ваші тестові дані ... */ };
-            }
-
-            // ПЕРЕТВОРЮЄМО моделі у ViewModel-і за допомогою маппера
             Internships = new ObservableCollection<InternshipViewModel>(
-                internshipModels.Select(model => _mapper.Map(model))
+                list.Select(i => new InternshipViewModel(i))
             );
-
             OnPropertyChanged(nameof(Internships));
         }
 
-        private void SaveData(object parameter)
+        private void LoadApplications()
         {
-            // ПЕРЕТВОРЮЄМО ViewModel-і назад у моделі перед збереженням
-            var internshipModels = new ObservableCollection<Internship>(
-                Internships.Select(vm => _mapper.Map(vm))
-            );
+            if (SelectedInternship == null) return;
 
-            _dataService.Save(FilePath, internshipModels);
-            MessageBox.Show("Data saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            var apps = _context.StudentApplications
+                .Where(sa => sa.InternshipId == SelectedInternship.Id)
+                .Include(sa => sa.Student)
+                .OrderByDescending(sa => sa.AppliedDate)
+                .ToList();
+
+            SelectedApplications = new ObservableCollection<StudentApplication>(apps);
+            OnPropertyChanged(nameof(SelectedApplications));
         }
 
+        private void AddInternship(object parameter)
+        {
+            var companies = _context.Companies.ToList();
+            var vm = new AddInternshipViewModel(companies);
+            var view = new Views.AddInternshipView
+            {
+                DataContext = vm,
+                Owner = Application.Current.MainWindow
+            };
 
+            if (view.ShowDialog() == true)
+            {
+                var newInternship = new Internship
+                {
+                    Title = vm.Title,
+                    Description = vm.Description,
+                    IsRemote = vm.IsRemote,
+                    CompanyId = vm.SelectedCompany.Id
+                };
+
+                _context.Internships.Add(newInternship);
+                _context.SaveChanges();
+                LoadData(null);
+            }
+        }
+
+        private void AddApplication(object parameter)
+        {
+            if (SelectedInternship == null) return;
+
+            var allStudents = _context.Students.ToList();
+            var vm = new AddApplicationViewModel(allStudents);
+            var view = new Views.AddApplicationView
+            {
+                DataContext = vm,
+                Owner = Application.Current.MainWindow
+            };
+
+            if (view.ShowDialog() == true)
+            {
+                bool exists = _context.StudentApplications.Any(sa =>
+                    sa.StudentId == vm.SelectedStudent.Id &&
+                    sa.InternshipId == SelectedInternship.Id);
+
+                if (exists)
+                {
+                    MessageBox.Show("Student already applied!");
+                    return;
+                }
+
+                var newApp = new StudentApplication
+                {
+                    StudentId = vm.SelectedStudent.Id,
+                    InternshipId = SelectedInternship.Id,
+                    Status = ApplicationStatus.Pending, // Тільки Pending за замовчуванням
+                    AppliedDate = DateTime.UtcNow
+                };
+
+                _context.StudentApplications.Add(newApp);
+                _context.SaveChanges();
+                LoadApplications();
+            }
+        }
+
+        private void UpdateAppStatus(object param, ApplicationStatus newStatus)
+        {
+            if (param is StudentApplication app)
+            {
+                try
+                {
+                    // Виклик ADO.NET процедури
+                    _adoService.UpdateStatus(app.StudentId, app.InternshipId, (int)newStatus);
+                    app.Status = newStatus;
+                    LoadApplications();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                }
+            }
+        }
+
+        private void CheckStats(object parameter)
+        {
+            try
+            {
+                int count = _adoService.GetTotalApplicationsCount();
+                MessageBox.Show($"Total Applications (ADO.NET): {count}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 }

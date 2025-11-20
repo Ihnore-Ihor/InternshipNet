@@ -3,18 +3,39 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:InternshipNet.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="200"
+             d:DesignHeight="70" d:DesignWidth="300"
              x:Name="root">
-    <!-- 1. Дали ім'я всьому UserControl -->
 
-    <!-- 2. Встановлюємо DataContext для Grid, щоб він брав дані з нашої властивості 'Internship' -->
-    <Grid Margin="5" DataContext="{Binding ElementName=root, Path=Internship}">
-        <StackPanel>
-            <!-- Тепер ці прив'язки працюють відносно Internship, а не старого DataContext -->
-            <TextBlock Text="{Binding Title}" FontWeight="Bold" />
-            <TextBlock Text="{Binding CompanyName}" FontStyle="Italic" />
-        </StackPanel>
-    </Grid>
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Border BorderBrush="#DDDDDD" BorderThickness="0,0,0,1" Padding="10" Background="White" Margin="0,0,0,5">
+        <Grid DataContext="{Binding ElementName=root, Path=Internship}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 1. Назва вакансії -->
+            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="#007ACC"/>
+
+            <!-- 2. Компанія та Індустрія -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4">
+                <TextBlock Text="{Binding CompanyName}" FontWeight="SemiBold" FontSize="12"/>
+                <TextBlock Text=" • " Foreground="Gray"/>
+                <TextBlock Text="{Binding Industry}" Foreground="Gray" FontStyle="Italic" FontSize="12"/>
+            </StackPanel>
+
+            <!-- 3. Мітка Remote (показується тільки якщо True) -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <Border Background="#E1F5FE" CornerRadius="4" Padding="6,2" Margin="0,4,0,0"
+                        Visibility="{Binding IsRemote, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="🌍 Remote" FontSize="11" Foreground="#0277BD" FontWeight="Bold"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>

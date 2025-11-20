@@ -1,0 +1,768 @@
+﻿
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\App.xaml
+================================================================================
+
+<Application x:Class="InternshipNet.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:InternshipNet.Converters"
+             StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+        <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="MinWidth" Value="75"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="#DDDDDD"/>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                      To="#BEE6FD" 
+                                      Duration="0:0:2.0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                      To="#DDDDDD" 
+                                      Duration="0:0:2.0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StatusRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+        </Style>
+
+    </Application.Resources>
+</Application>
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\App.xaml.cs
+================================================================================
+
+using System.Configuration;
+using System.Data;
+using System.Windows;
+
+namespace InternshipNet
+{
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
+    {
+    }
+
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\AssemblyInfo.cs
+================================================================================
+
+using System.Windows;
+
+[assembly: ThemeInfo(
+    ResourceDictionaryLocation.None,            //where theme specific resource dictionaries are located
+                                                //(used if a resource is not found in the page,
+                                                // or application resource dictionaries)
+    ResourceDictionaryLocation.SourceAssembly   //where the generic resource dictionary is located
+                                                //(used if a resource is not found in the page,
+                                                // app, or any theme specific resource dictionaries)
+)]
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Converters\NullToVisibilityConverter.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+
+namespace InternshipNet.Converters
+{
+    public class NullToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value == null ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Converters\StatusToColorConverter.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Globalization;
+using System.Windows.Data;
+using System.Windows.Media;
+
+namespace InternshipNet.Converters
+{
+    public class StatusToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string status = value as string;
+            if (string.IsNullOrEmpty(status))
+            {
+                return Brushes.Transparent; 
+            }
+
+            switch (status.ToLower())
+            {
+                case "accepted":
+                    return new SolidColorBrush(Colors.LightGreen);
+                case "pending":
+                    return new SolidColorBrush(Colors.LightYellow);
+                case "rejected":
+                    return new SolidColorBrush(Colors.LightCoral);
+                default:
+                    return Brushes.Transparent;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Mappers\InternshipMapper.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Riok.Mapperly.Abstractions;
+using InternshipNet.Models;
+using InternshipNet.ViewModels;
+
+namespace InternshipNet.Mappers
+{
+    [Mapper]
+    public partial class InternshipMapper
+    {
+        public partial InternshipViewModel Map(Internship internship);
+
+        public partial Internship Map(InternshipViewModel internshipViewModel);
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Models\Internship.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InternshipNet.Models
+{
+    public class Internship
+    {
+        public string Title { get; set; }
+        public string CompanyName { get; set; }
+        public string Description { get; set; }
+        public ObservableCollection<StudentApplication> Applications { get; set; } = new ObservableCollection<StudentApplication>();
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Models\StudentApplication.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InternshipNet.Models
+{
+    public class StudentApplication
+    {
+        public string StudentName { get; set; }
+        public string Status { get; set; }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Services\JsonDataService.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using InternshipNet.Models;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
+
+namespace InternshipNet.Services
+{
+    public class JsonDataService
+    {
+        public void Save(string filePath, ObservableCollection<Internship> data)
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(data, options);
+            File.WriteAllText(filePath, json);
+        }
+
+        public ObservableCollection<Internship> Load(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return new ObservableCollection<Internship>();
+            }
+
+            string json = File.ReadAllText(filePath);
+            if (string.IsNullOrEmpty(json))
+            {
+                return new ObservableCollection<Internship>();
+            }
+
+            return JsonSerializer.Deserialize<ObservableCollection<Internship>>(json);
+        }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\UserControls\InternshipListItem.xaml
+================================================================================
+
+<UserControl x:Class="InternshipNet.UserControls.InternshipListItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:InternshipNet.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="200"
+             x:Name="root">
+
+    <Grid Margin="5" DataContext="{Binding ElementName=root, Path=Internship}">
+        <StackPanel>
+            <TextBlock Text="{Binding Title}" FontWeight="Bold" />
+            <TextBlock Text="{Binding CompanyName}" FontStyle="Italic" />
+        </StackPanel>
+    </Grid>
+</UserControl>
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\UserControls\InternshipListItem.xaml.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using InternshipNet.ViewModels;
+
+namespace InternshipNet.UserControls
+{
+    public partial class InternshipListItem : UserControl
+    {
+        public InternshipListItem() { InitializeComponent(); }
+
+        public static readonly DependencyProperty InternshipProperty =
+            DependencyProperty.Register(
+                "Internship",
+                typeof(InternshipViewModel),
+                typeof(InternshipListItem),
+                new PropertyMetadata(null));
+
+        public InternshipViewModel Internship 
+        {
+            get { return (InternshipViewModel)GetValue(InternshipProperty); } 
+            set { SetValue(InternshipProperty, value); }
+        }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\ViewModels\AddApplicationViewModel.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using InternshipNet.Models;
+using System.Collections.ObjectModel;
+using System.ComponentModel; 
+
+namespace InternshipNet.ViewModels
+{
+    public class AddApplicationViewModel : ViewModelBase, IDataErrorInfo
+    {
+        private string _studentName;
+        public string StudentName
+        {
+            get => _studentName;
+            set { _studentName = value; OnPropertyChanged(); }
+        }
+
+        private string _status;
+        public string Status
+        {
+            get => _status;
+            set { _status = value; OnPropertyChanged(); }
+        }
+
+        public ObservableCollection<string> Statuses { get; }
+        public StudentApplication Application { get; private set; }
+
+        public AddApplicationViewModel()
+        {
+            Statuses = new ObservableCollection<string> { "Pending", "Accepted", "Rejected" };
+            Status = "Pending";
+        }
+
+        public void CreateApplication()
+        {
+            Application = new StudentApplication { StudentName = this.StudentName, Status = this.Status };
+        }
+
+
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = string.Empty;
+                if (columnName == nameof(StudentName) && string.IsNullOrWhiteSpace(StudentName))
+                {
+                    error = "Student name cannot be empty.";
+                }
+                return error;
+            }
+        }
+
+        public string Error => null;
+
+        public bool IsValid => string.IsNullOrWhiteSpace(this[nameof(StudentName)]);
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\ViewModels\InternshipViewModel.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using InternshipNet.Models;
+using System.Collections.ObjectModel;
+
+namespace InternshipNet.ViewModels
+{
+    public class InternshipViewModel : ViewModelBase
+    {
+        public string Title { get; set; }
+        public string CompanyName { get; set; }
+        public string Description { get; set; }
+        public ObservableCollection<StudentApplication> Applications { get; set; } = new ObservableCollection<StudentApplication>();
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\ViewModels\MainViewModel.cs
+================================================================================
+
+using InternshipNet.Models;
+using InternshipNet.Services;
+using InternshipNet.Mappers; 
+using InternshipNet.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows; 
+using System.Windows.Input;
+
+namespace InternshipNet.ViewModels
+{
+    public class MainViewModel : ViewModelBase
+    {
+        private readonly JsonDataService _dataService;
+        private readonly InternshipMapper _mapper; 
+        private const string FilePath = "internships.json"; 
+
+        private InternshipViewModel _selectedInternship;
+        public InternshipViewModel SelectedInternship
+        {
+            get => _selectedInternship;
+            set { _selectedInternship = value; OnPropertyChanged(); }
+        }
+
+        public ObservableCollection<InternshipViewModel> Internships { get; set; }
+
+        public ICommand LoadCommand { get; }
+        public ICommand SaveCommand { get; }
+
+        public ICommand AddApplicationCommand { get; }
+
+
+        public MainViewModel()
+        {
+            _dataService = new JsonDataService();
+            _mapper = new InternshipMapper(); 
+
+            LoadCommand = new RelayCommand(LoadData);
+            SaveCommand = new RelayCommand(SaveData);
+
+            AddApplicationCommand = new RelayCommand(AddApplication, CanAddApplication);
+
+            LoadData(null);
+        }
+
+        private bool CanAddApplication(object parameter)
+        {
+            return SelectedInternship != null;
+        }
+
+        private void AddApplication(object parameter)
+        {
+            var viewModel = new AddApplicationViewModel();
+            var view = new Views.AddApplicationView
+            {
+                DataContext = viewModel,
+                Owner = Application.Current.MainWindow
+            };
+
+            if (view.ShowDialog() == true)
+            {
+                SelectedInternship.Applications.Add(viewModel.Application);
+            }
+        }
+
+        private void LoadData(object parameter)
+        {
+            var internshipModels = _dataService.Load(FilePath);
+
+            if (!internshipModels.Any())
+            {
+                internshipModels = new ObservableCollection<Internship> { };
+            }
+
+            Internships = new ObservableCollection<InternshipViewModel>(
+                internshipModels.Select(model => _mapper.Map(model))
+            );
+
+            OnPropertyChanged(nameof(Internships));
+        }
+
+        private void SaveData(object parameter)
+        {
+            var internshipModels = new ObservableCollection<Internship>(
+                Internships.Select(vm => _mapper.Map(vm))
+            );
+
+            _dataService.Save(FilePath, internshipModels);
+            MessageBox.Show("Data saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\ViewModels\RelayCommand.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+
+namespace InternshipNet.ViewModels
+{
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
+
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
+
+        public void Execute(object parameter)
+        {
+            _execute(parameter);
+        }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\ViewModels\ViewModelBase.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace InternshipNet.ViewModels
+{
+    public class ViewModelBase : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Views\AddApplicationView.xaml
+================================================================================
+
+<Window x:Class="InternshipNet.Views.AddApplicationView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add New Application" Height="220" Width="300"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="15">
+        <TextBlock Text="Student Name:"/>
+        <TextBox Text="{Binding StudentName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Margin="0,5,0,10"/>
+
+        <TextBlock Text="Status:"/>
+        <ComboBox ItemsSource="{Binding Statuses}" 
+                  SelectedItem="{Binding Status}" Margin="0,5,0,15"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="OK" IsDefault="True" Click="OkButton_Click" Width="75"/>
+            <Button Content="Cancel" IsCancel="True" Width="75" Margin="5,0,0,0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Views\AddApplicationView.xaml.cs
+================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using InternshipNet.ViewModels; 
+
+namespace InternshipNet.Views
+{
+    public partial class AddApplicationView : Window
+    {
+        public AddApplicationView()
+        {
+            InitializeComponent();
+        }
+
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = DataContext as AddApplicationViewModel;
+
+            if (viewModel != null && !viewModel.IsValid)
+            {
+                MessageBox.Show("Please correct the errors before proceeding.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return; 
+            }
+
+            if (viewModel != null)
+            {
+                viewModel.CreateApplication();
+            }
+
+            this.DialogResult = true;
+        }
+    }
+}
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Views\MainWindow.xaml
+================================================================================
+
+<Window x:Class="InternshipNet.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InternshipNet"
+        xmlns:userControls="clr-namespace:InternshipNet.UserControls" xmlns:local1="clr-namespace:InternshipNet.Converters"
+        mc:Ignorable="d"
+        Title="InternshipNet Platform" Height="450" Width="800">
+
+    <Window.Resources>
+        <local1:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0">
+            <TextBlock Text="Internships" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <Button Content="Save" Command="{Binding SaveCommand}" Margin="0,0,5,0"/>
+                <Button Content="Load" Command="{Binding LoadCommand}"/>
+            </StackPanel>
+
+            <ListBox ItemsSource="{Binding Internships}" 
+             SelectedItem="{Binding SelectedInternship}"
+             Height="320">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <userControls:InternshipListItem Internship="{Binding}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <Grid Grid.Column="1" Margin="10,0,0,0" DataContext="{Binding SelectedInternship}">
+            <StackPanel Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}">
+                <TextBlock Text="Internship Details" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Company:" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CompanyName}" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Description:" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Applications:" FontWeight="Bold"/>
+
+                <Button Content="Add Application" 
+                    Command="{Binding DataContext.AddApplicationCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                     HorizontalAlignment="Left" Margin="0,5,0,5"/>
+
+                <DataGrid ItemsSource="{Binding Applications}" 
+                    AutoGenerateColumns="True" 
+                    IsReadOnly="True" 
+                    Height="150"
+                    RowStyle="{StaticResource StatusRowStyle}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
+
+================================================================================
+FILE: C:\Users\USER\Documents\SC\Lab02\InternshipNet\InternshipNet\Views\MainWindow.xaml.cs
+================================================================================
+
+using InternshipNet.ViewModels;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+
+namespace InternshipNet
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = new MainViewModel();
+
+        }
+    }
+}

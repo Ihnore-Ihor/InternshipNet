@@ -3,70 +3,203 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:InternshipNet"
-        xmlns:userControls="clr-namespace:InternshipNet.UserControls" xmlns:local1="clr-namespace:InternshipNet.Converters"
+        xmlns:userControls="clr-namespace:InternshipNet.UserControls" 
+        xmlns:converters="clr-namespace:InternshipNet.Converters"
         mc:Ignorable="d"
-        Title="InternshipNet Platform" Height="450" Width="800">
+        Title="InternshipNet Platform (Lab 3)" Height="600" Width="1000"
+        Background="#F5F5F5">
 
     <Window.Resources>
-        <local1:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <converters:NullToVisibilityConverter x:Key="NullToVis"/>
+        <converters:StatusToColorConverter x:Key="StatusToColor"/>
+
+        <!-- Виправлений стиль кнопок -->
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
 
-    <Grid Margin="10">
+    <Grid Margin="15">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="350"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Ліва панель: Список стажувань -->
-        <StackPanel Grid.Column="0">
-            <TextBlock Text="Internships" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+        <!-- ЛІВА ЧАСТИНА -->
+        <Grid Grid.Column="0" Margin="0,0,15,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <!-- ДОДАНО: Панель з кнопками -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <Button Content="Save" Command="{Binding SaveCommand}" Margin="0,0,5,0"/>
-                <Button Content="Load" Command="{Binding LoadCommand}"/>
-            </StackPanel>
+            <TextBlock Text="Internships" FontSize="24" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
 
-            <ListBox ItemsSource="{Binding Internships}" 
-             SelectedItem="{Binding SelectedInternship}"
-             Height="320">
-                <!-- Зменшив висоту, щоб вмістились кнопки -->
+            <ListBox Grid.Row="1" 
+                     ItemsSource="{Binding Internships}" 
+                     SelectedItem="{Binding SelectedInternship}"
+                     Background="Transparent" BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <!-- Тепер ми явно передаємо дані у властивість 'Internship' -->
                         <userControls:InternshipListItem Internship="{Binding}"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0,0,0,8"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
             </ListBox>
-        </StackPanel>
 
-        <!-- Права панель: Деталі обраного стажування -->
-        <!-- Вона буде видима тільки якщо стажування обрано -->
-        <Grid Grid.Column="1" Margin="10,0,0,0" DataContext="{Binding SelectedInternship}">
-            <!-- Використовуємо Visibility, щоб панель зникала, якщо нічого не обрано -->
-            <StackPanel Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}">
-                <TextBlock Text="Internship Details" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+            <StackPanel Grid.Row="2" Orientation="Vertical" Margin="0,15,0,0">
+                <Button Content="➕ Add Internship" Command="{Binding AddInternshipCommand}" 
+                        Background="#007ACC" Foreground="White" FontWeight="Bold" Height="40" FontSize="14"/>
 
-                <TextBlock Text="Company:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding CompanyName}" Margin="0,0,0,10"/>
-
-                <TextBlock Text="Description:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-
-                <TextBlock Text="Applications:" FontWeight="Bold"/>
-
-                <!-- ДОДАНО: Кнопка для виклику модального вікна -->
-                <Button Content="Add Application" 
-                    Command="{Binding DataContext.AddApplicationCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                     HorizontalAlignment="Left" Margin="0,5,0,5"/>
-
-                <DataGrid ItemsSource="{Binding Applications}" 
-                    AutoGenerateColumns="True" 
-                    IsReadOnly="True" 
-                    Height="150"
-                    RowStyle="{StaticResource StatusRowStyle}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                    <Button Content="Refresh List" Command="{Binding LoadCommand}" Width="100"/>
+                    <Button Content="Check Stats" Command="{Binding CheckStatsCommand}" Width="100"/>
+                </StackPanel>
             </StackPanel>
         </Grid>
+
+        <!-- ПРАВА ЧАСТИНА -->
+        <Border Grid.Column="1" Background="White" CornerRadius="8" Padding="25">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" Direction="270" Color="#CCCCCC" Opacity="0.4" ShadowDepth="5"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid Visibility="{Binding SelectedInternship, Converter={StaticResource NullToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0">
+                        <TextBlock Text="{Binding SelectedInternship.Title}" FontSize="28" FontWeight="Bold" Foreground="#007ACC"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,15">
+                            <TextBlock Text="{Binding SelectedInternship.CompanyName}" FontSize="16" FontWeight="SemiBold" Foreground="#555"/>
+                            <TextBlock Text=" | " FontSize="16" Foreground="#AAA" Margin="5,0"/>
+                            <TextBlock Text="{Binding SelectedInternship.Industry}" FontSize="16" Foreground="#777"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Description:" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding SelectedInternship.Description}" TextWrapping="Wrap" FontSize="14" LineHeight="20" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Applications" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="➕ New Application" Command="{Binding AddApplicationCommand}" 
+                                Background="#4CAF50" Foreground="White" Padding="15,5"/>
+                    </Grid>
+
+                    <DataGrid Grid.Row="2" 
+                              ItemsSource="{Binding SelectedApplications}" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True"
+                              BorderThickness="1" BorderBrush="#E0E0E0"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              Background="White"
+                              CanUserAddRows="False">
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Padding" Value="10"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Background" Value="#F9F9F9"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="10"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.CellStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Student" Binding="{Binding Student.Name}" Width="*" ElementStyle="{StaticResource {x:Type TextBlock}}"/>
+                            <DataGridTextColumn Header="Applied Date" Binding="{Binding AppliedDate, StringFormat=d}" Width="120"/>
+
+                            <!-- STATUS (Colored) -->
+                            <DataGridTemplateColumn Header="Status" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding Status, Converter={StaticResource StatusToColor}}" 
+                                                CornerRadius="4" Padding="8,2" HorizontalAlignment="Center">
+                                            <TextBlock Text="{Binding Status}" Foreground="Black" FontWeight="SemiBold"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- ACTIONS (Buttons) -->
+                            <DataGridTemplateColumn Header="Review" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <!-- Accept -->
+                                            <Button Command="{Binding DataContext.AcceptCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip="Accept Application"
+                                                    Background="#E8F5E9" BorderBrush="#4CAF50" BorderThickness="1"
+                                                    Width="35" Height="30">
+                                                <TextBlock Text="✔" Foreground="#2E7D32" FontWeight="Bold" FontSize="14"/>
+                                            </Button>
+
+                                            <!-- Reject -->
+                                            <Button Command="{Binding DataContext.RejectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip="Reject Application"
+                                                    Background="#FFEBEE" BorderBrush="#EF5350" BorderThickness="1"
+                                                    Width="35" Height="30" Margin="10,0,0,0">
+                                                <TextBlock Text="✘" Foreground="#C62828" FontWeight="Bold" FontSize="14"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedInternship}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="⬅ Select an internship to view details" FontSize="18" Foreground="#AAA"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

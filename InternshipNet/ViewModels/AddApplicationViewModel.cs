@@ -1,65 +1,43 @@
-﻿using System;
+﻿using InternshipNet.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using InternshipNet.Models;
 using System.Collections.ObjectModel;
-using System.ComponentModel; // <-- Додайте цей using
+using System.ComponentModel;
 
 namespace InternshipNet.ViewModels
 {
-    // Реалізуємо інтерфейс IDataErrorInfo
     public class AddApplicationViewModel : ViewModelBase, IDataErrorInfo
     {
-        private string _studentName;
-        public string StudentName
+        public ObservableCollection<Student> Students { get; set; }
+
+        private Student _selectedStudent;
+        public Student SelectedStudent
         {
-            get => _studentName;
-            set { _studentName = value; OnPropertyChanged(); }
+            get => _selectedStudent;
+            set { _selectedStudent = value; OnPropertyChanged(); }
         }
 
-        private string _status;
-        public string Status
+        public AddApplicationViewModel(List<Student> existingStudents)
         {
-            get => _status;
-            set { _status = value; OnPropertyChanged(); }
+            Students = new ObservableCollection<Student>(existingStudents);
         }
 
-        public ObservableCollection<string> Statuses { get; }
-        public StudentApplication Application { get; private set; }
-
-        public AddApplicationViewModel()
+        public void AddNewStudentToList(Student newStudent)
         {
-            Statuses = new ObservableCollection<string> { "Pending", "Accepted", "Rejected" };
-            Status = "Pending";
+            Students.Add(newStudent);
+            SelectedStudent = newStudent;
         }
 
-        public void CreateApplication()
-        {
-            Application = new StudentApplication { StudentName = this.StudentName, Status = this.Status };
-        }
-
-        // --- РЕАЛІЗАЦІЯ ВАЛІДАЦІЇ ---
-
-        // Ця властивість буде містити текст помилки для конкретної властивості (напр., StudentName)
         public string this[string columnName]
         {
             get
             {
-                string error = string.Empty;
-                if (columnName == nameof(StudentName) && string.IsNullOrWhiteSpace(StudentName))
-                {
-                    error = "Student name cannot be empty.";
-                }
-                return error;
+                if (columnName == nameof(SelectedStudent) && SelectedStudent == null)
+                    return "Please select a student.";
+                return string.Empty;
             }
         }
 
-        // Ця властивість може повертати загальну помилку для всього об'єкта. Нам це не потрібно.
         public string Error => null;
-
-        // Допоміжна властивість, щоб перевірити, чи всі дані валідні
-        public bool IsValid => string.IsNullOrWhiteSpace(this[nameof(StudentName)]);
+        public bool IsValid => SelectedStudent != null;
     }
 }

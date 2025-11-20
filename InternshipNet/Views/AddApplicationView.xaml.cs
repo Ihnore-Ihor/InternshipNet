@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using InternshipNet.ViewModels; // Додайте цей using
+﻿using System.Windows;
+using InternshipNet.Data;
+using InternshipNet.Models;
+using InternshipNet.ViewModels;
 
 namespace InternshipNet.Views
 {
@@ -22,23 +12,38 @@ namespace InternshipNet.Views
             InitializeComponent();
         }
 
+        private void AddStudent_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SimpleInputDialog("New Student", "Enter Student Name:");
+            if (dialog.ShowDialog() == true)
+            {
+                string name = dialog.ResultText;
+
+                using (var context = new ApplicationDbContext())
+                {
+                    var newStudent = new Student { Name = name, Email = "new@student.com" };
+                    context.Students.Add(newStudent);
+                    context.SaveChanges();
+
+                    if (DataContext is AddApplicationViewModel vm)
+                    {
+                        vm.AddNewStudentToList(newStudent);
+                    }
+                }
+            }
+        }
+
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            var viewModel = DataContext as AddApplicationViewModel;
-
-            // ПЕРЕВІРЯЄМО, ЧИ ДАНІ ВАЛІДНІ
-            if (viewModel != null && !viewModel.IsValid)
+            var vm = DataContext as AddApplicationViewModel;
+            if (vm != null && vm.IsValid)
             {
-                MessageBox.Show("Please correct the errors before proceeding.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return; // Не закриваємо вікно
+                this.DialogResult = true;
             }
-
-            if (viewModel != null)
+            else
             {
-                viewModel.CreateApplication();
+                MessageBox.Show("Please select a student.");
             }
-
-            this.DialogResult = true;
         }
     }
 }

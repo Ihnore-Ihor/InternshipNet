@@ -6,10 +6,18 @@ using System.Threading.Tasks;
 
 namespace InternshipNet.Models
 {
-    // Додайте ключове слово 'public'
     public class StudentApplication
     {
-        public string StudentName { get; set; }
-        public string Status { get; set; }
+        // Складений ключ (Composite Key) буде налаштовано в Context пізніше:
+        // Він складатиметься з StudentId + InternshipId
+
+        public int StudentId { get; set; }
+        public Student Student { get; set; }
+
+        public int InternshipId { get; set; }
+        public Internship Internship { get; set; }
+
+        public ApplicationStatus Status { get; set; }
+        public DateTime AppliedDate { get; set; }
     }
 }

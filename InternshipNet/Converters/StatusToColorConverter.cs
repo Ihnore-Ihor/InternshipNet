@@ -13,14 +13,12 @@ namespace InternshipNet.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // Перетворюємо вхідне значення (статус) в рядок
             string status = value as string;
             if (string.IsNullOrEmpty(status))
             {
-                return Brushes.Transparent; // Прозорий фон, якщо статусу немає
+                return Brushes.Transparent; 
             }
 
-            // Повертаємо колір залежно від статусу
             switch (status.ToLower())
             {
                 case "accepted":
@@ -36,7 +34,6 @@ namespace InternshipNet.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // Зворотне перетворення нам не потрібне
             throw new NotImplementedException();
         }
     }

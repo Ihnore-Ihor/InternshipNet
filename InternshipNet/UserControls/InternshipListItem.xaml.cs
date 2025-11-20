@@ -11,7 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using InternshipNet.ViewModels; // <-- Змінили using
+using InternshipNet.ViewModels;
 
 namespace InternshipNet.UserControls
 {
@@ -22,13 +22,13 @@ namespace InternshipNet.UserControls
         public static readonly DependencyProperty InternshipProperty =
             DependencyProperty.Register(
                 "Internship",
-                typeof(InternshipViewModel), // <-- ЗМІНИЛИ ТИП ТУТ
+                typeof(InternshipViewModel),
                 typeof(InternshipListItem),
                 new PropertyMetadata(null));
 
-        public InternshipViewModel Internship // <-- І ТУТ
+        public InternshipViewModel Internship 
         {
-            get { return (InternshipViewModel)GetValue(InternshipProperty); } // <-- І ТУТ
+            get { return (InternshipViewModel)GetValue(InternshipProperty); } 
             set { SetValue(InternshipProperty, value); }
         }
     }
