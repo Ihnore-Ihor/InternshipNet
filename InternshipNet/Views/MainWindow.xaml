@@ -13,7 +13,6 @@
         <converters:NullToVisibilityConverter x:Key="NullToVis"/>
         <converters:StatusToColorConverter x:Key="StatusToColor"/>
 
-        <!-- Виправлений стиль кнопок -->
         <Style TargetType="Button">
             <Setter Property="Padding" Value="5"/>
             <Setter Property="Margin" Value="2"/>
@@ -29,7 +28,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ЛІВА ЧАСТИНА -->
+        <!-- Lefy part -->
         <Grid Grid.Column="0" Margin="0,0,15,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -69,7 +68,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- ПРАВА ЧАСТИНА -->
+        <!-- Right part -->
         <Border Grid.Column="1" Background="White" CornerRadius="8" Padding="25">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="20" Direction="270" Color="#CCCCCC" Opacity="0.4" ShadowDepth="5"/>

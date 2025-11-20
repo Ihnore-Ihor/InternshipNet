@@ -14,10 +14,10 @@ namespace InternshipNet.Models
         public string Name { get; set; }
         public string Email { get; set; }
 
-        // Зв'язок 1-1: У студента одне резюме
+        // 1-to-1 relationship: A student has one resume
         public Resume Resume { get; set; }
 
-        // Зв'язок N-M: Студент подає багато заявок
+        // Many-to-many relationship: A student can submit multiple applications
         public ICollection<StudentApplication> Applications { get; set; }
     }
 }

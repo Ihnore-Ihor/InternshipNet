@@ -19,17 +19,17 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- 1. Назва вакансії -->
+            <!-- Internship Title -->
             <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="#007ACC"/>
 
-            <!-- 2. Компанія та Індустрія -->
+            <!-- Company and Industry -->
             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4">
                 <TextBlock Text="{Binding CompanyName}" FontWeight="SemiBold" FontSize="12"/>
                 <TextBlock Text=" • " Foreground="Gray"/>
                 <TextBlock Text="{Binding Industry}" Foreground="Gray" FontStyle="Italic" FontSize="12"/>
             </StackPanel>
 
-            <!-- 3. Мітка Remote (показується тільки якщо True) -->
+            <!-- Remote Label (shown only if IsRemote is True) -->
             <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <Border Background="#E1F5FE" CornerRadius="4" Padding="6,2" Margin="0,4,0,0"
                         Visibility="{Binding IsRemote, Converter={StaticResource BoolToVis}}">

@@ -9,9 +9,9 @@ namespace InternshipNet.Models
     public class Resume
     {
         public int Id { get; set; }
-        public string Content { get; set; } // Текст резюме або посилання
+        public string Content { get; set; }
 
-        // Зовнішній ключ (Foreign Key) на студента
+        // Foreign key to the student
         public int StudentId { get; set; }
         public Student Student { get; set; }
     }

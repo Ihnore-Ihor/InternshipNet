@@ -6,17 +6,16 @@ namespace InternshipNet.Services
 {
     public class AdoNetService
     {
-        // ВАЖЛИВО: Введіть сюди ваш пароль
         private readonly string _connectionString = "Host=localhost;Port=5432;Database=InternshipNetDb;Username=postgres;Password=p";
 
-        // Метод 1: Виклик збереженої процедури (Stored Procedure)
+        // Call a stored procedure to update application status
         public void UpdateStatus(int studentId, int internshipId, int newStatus)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
                 conn.Open();
 
-                // Викликаємо процедуру через SQL-команду CALL
+                // Call the stored procedure using a SQL CALL command
                 using (var cmd = new NpgsqlCommand("CALL sp_UpdateApplicationStatus(@sId, @iId, @st)", conn))
                 {
                     cmd.Parameters.AddWithValue("sId", studentId);
@@ -28,7 +27,7 @@ namespace InternshipNet.Services
             }
         }
 
-        // Метод 2: Отримання статистики (Чистий SELECT запит через ADO.NET)
+        // Get total number of student applications using a SELECT query
         public int GetTotalApplicationsCount()
         {
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -36,7 +35,7 @@ namespace InternshipNet.Services
                 conn.Open();
                 using (var cmd = new NpgsqlCommand("SELECT COUNT(*) FROM \"StudentApplications\"", conn))
                 {
-                    // ExecuteScalar повертає одне значення (першу клітинку)
+                    // ExecuteScalar returns a single value (the first cell of the result)
                     var result = cmd.ExecuteScalar();
                     return Convert.ToInt32(result);
                 }

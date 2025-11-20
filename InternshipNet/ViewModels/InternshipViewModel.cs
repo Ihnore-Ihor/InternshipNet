@@ -11,14 +11,12 @@ namespace InternshipNet.ViewModels
         public InternshipViewModel(Internship model)
         {
             _model = model;
-            // Завантажуємо існуючі заявки у ViewModel
             if (model.Applications != null)
             {
                 Applications = new ObservableCollection<StudentApplication>(model.Applications);
             }
         }
 
-        // Повертаємо реальну модель для збереження
         public Internship GetModel() => _model;
 
         public int Id => _model.Id;
@@ -29,7 +27,6 @@ namespace InternshipNet.ViewModels
             set { _model.Title = value; OnPropertyChanged(); }
         }
 
-        // Беремо назву компанії з об'єкта Company
         public string CompanyName
         {
             get => _model.Company?.Name ?? "Unknown";

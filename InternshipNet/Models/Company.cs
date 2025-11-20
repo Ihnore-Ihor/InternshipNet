@@ -13,8 +13,6 @@ namespace InternshipNet.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Industry { get; set; }
-
-        // Навігаційна властивість: список стажувань цієї компанії
         public ICollection<Internship> Internships { get; set; }
     }
 }

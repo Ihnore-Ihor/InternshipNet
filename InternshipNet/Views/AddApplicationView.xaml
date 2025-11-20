@@ -8,7 +8,6 @@
 
         <TextBlock Text="Select Student:" FontWeight="Bold"/>
 
-        <!-- Вибір студента + Кнопка додавання -->
         <Grid Margin="0,5,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

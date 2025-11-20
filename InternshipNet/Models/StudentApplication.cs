@@ -8,8 +8,8 @@ namespace InternshipNet.Models
 {
     public class StudentApplication
     {
-        // Складений ключ (Composite Key) буде налаштовано в Context пізніше:
-        // Він складатиметься з StudentId + InternshipId
+        // The composite key will be configured in the DbContext later:
+        // It will consist of StudentId + InternshipId
 
         public int StudentId { get; set; }
         public Student Student { get; set; }

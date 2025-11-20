@@ -29,7 +29,6 @@ namespace InternshipNet.ViewModels
             set { _isRemote = value; OnPropertyChanged(); }
         }
 
-        // Список компаній
         public ObservableCollection<Company> Companies { get; set; }
 
         private Company _selectedCompany;
@@ -45,7 +44,6 @@ namespace InternshipNet.ViewModels
             SelectedCompany = Companies.FirstOrDefault();
         }
 
-        // Метод для додавання нової компанії в список (викликається з View)
         public void AddNewCompanyToList(Company newCompany)
         {
             Companies.Add(newCompany);

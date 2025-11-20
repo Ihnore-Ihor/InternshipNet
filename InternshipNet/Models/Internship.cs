@@ -13,13 +13,13 @@ namespace InternshipNet.Models
         public string Title { get; set; }
         public string Description { get; set; }
 
-        // Зв'язок 1-N: Стажування належить одній компанії
+        // 1-N relationship: Internship belongs to one company
         public int CompanyId { get; set; }
         public Company Company { get; set; }
 
         public bool IsRemote { get; set; }
 
-        // Зв'язок N-M: На стажування подано багато заявок
+        // N-M relationship: Many student applications can be submitted for an internship
         public ICollection<StudentApplication> Applications { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using InternshipNet.Data; // Для доступу до БД
+using InternshipNet.Data;
 using InternshipNet.Models;
 using InternshipNet.ViewModels;
 
@@ -14,20 +14,20 @@ namespace InternshipNet.Views
 
         private void AddCompany_Click(object sender, RoutedEventArgs e)
         {
-            // Відкриваємо діалог
+            // Open input dialog for new company name
             var dialog = new SimpleInputDialog("New Company", "Enter Company Name:");
             if (dialog.ShowDialog() == true)
             {
                 string companyName = dialog.ResultText;
 
-                // Зберігаємо в БД
+                // Save new company to the database
                 using (var context = new ApplicationDbContext())
                 {
                     var newComp = new Company { Name = companyName, Industry = "New Industry" };
                     context.Companies.Add(newComp);
                     context.SaveChanges();
 
-                    // Оновлюємо ViewModel
+                    // Update the ViewModel with the new company
                     if (DataContext is AddInternshipViewModel vm)
                     {
                         vm.AddNewCompanyToList(newComp);

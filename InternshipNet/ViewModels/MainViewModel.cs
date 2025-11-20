@@ -136,7 +136,7 @@ namespace InternshipNet.ViewModels
                 {
                     StudentId = vm.SelectedStudent.Id,
                     InternshipId = SelectedInternship.Id,
-                    Status = ApplicationStatus.Pending, // Тільки Pending за замовчуванням
+                    Status = ApplicationStatus.Pending,
                     AppliedDate = DateTime.UtcNow
                 };
 
@@ -152,7 +152,6 @@ namespace InternshipNet.ViewModels
             {
                 try
                 {
-                    // Виклик ADO.NET процедури
                     _adoService.UpdateStatus(app.StudentId, app.InternshipId, (int)newStatus);
                     app.Status = newStatus;
                     LoadApplications();
