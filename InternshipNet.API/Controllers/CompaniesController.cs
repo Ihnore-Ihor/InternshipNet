@@ -62,5 +62,44 @@ namespace InternshipNet.API.Controllers
             // Return status 201 Created
             return CreatedAtAction(nameof(GetCompanies), new { id = company.Id }, dto);
         }
+
+        /// <summary>
+        /// Оновити дані компанії
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCompany(int id, [FromBody] CreateCompanyDto updateDto)
+        {
+            var company = await _context.Companies.FindAsync(id);
+
+            if (company == null)
+            {
+                return NotFound($"Company with ID {id} not found.");
+            }
+
+            company.Name = updateDto.Name;
+            company.Industry = updateDto.Industry;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Видалити компанію
+        /// </summary>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCompany(int id)
+        {
+            var company = await _context.Companies.FindAsync(id);
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            _context.Companies.Remove(company);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
