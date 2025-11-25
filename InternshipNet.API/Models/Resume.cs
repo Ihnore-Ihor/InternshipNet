@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InternshipNet.API.Models
+{
+    public class Resume
+    {
+        public int Id { get; set; }
+        public string Content { get; set; }
+
+        // Foreign key to the student
+        public int StudentId { get; set; }
+        public Student Student { get; set; }
+    }
+}
